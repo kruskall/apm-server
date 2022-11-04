@@ -188,6 +188,9 @@ func handleReq(metaUpdateChan chan docsStat, writer io.Writer) http.HandlerFunc 
 
 			var stat docsStat
 			for scanner.Scan() {
+				if !bytes.Contains(scanner.Bytes(), []byte("metrics-apm.internal-default")) {
+					continue
+				}
 				n, err := writer.Write(scanner.Bytes())
 				if err != nil {
 					// Discard the request without processing further
