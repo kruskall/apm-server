@@ -14,11 +14,12 @@ import (
 	"github.com/axiomhq/hyperloglog"
 	"github.com/cespare/xxhash/v2"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-server/internal/logs"
 	"github.com/elastic/apm-server/x-pack/apm-server/aggregation/baseaggregator"
 	"github.com/elastic/apm-server/x-pack/apm-server/aggregation/interval"
@@ -32,9 +33,9 @@ const (
 
 // AggregatorConfig holds configuration for creating an Aggregator.
 type AggregatorConfig struct {
-	// BatchProcessor is a model.BatchProcessor for asynchronously
+	// BatchProcessor is a modelpb.BatchProcessor for asynchronously
 	// processing metrics documents.
-	BatchProcessor model.BatchProcessor
+	BatchProcessor modelpb.BatchProcessor
 
 	// Logger is the logger for logging metrics aggregation/publishing.
 	//
@@ -157,7 +158,7 @@ func (a *Aggregator) publish(ctx context.Context, period time.Duration) error {
 
 	intervalStr := interval.FormatDuration(period)
 	isMetricsPeriod := period == a.config.Interval
-	batch := make(model.Batch, 0, size)
+	batch := make(modelpb.Batch, 0, size)
 	for key, metrics := range current.m {
 		for _, entry := range metrics {
 			m := makeMetricset(*entry, intervalStr)
@@ -172,7 +173,7 @@ func (a *Aggregator) publish(ctx context.Context, period time.Duration) error {
 			atomic.AddInt64(&a.metrics.overflow, int64(overflowCount))
 		}
 		m := makeMetricset(*current.other, intervalStr)
-		m.Metricset.Samples = append(m.Metricset.Samples, model.MetricsetSample{
+		m.Metricset.Samples = append(m.Metricset.Samples, &modelpb.MetricsetSample{
 			Name:  "service_summary.aggregation.overflow_count",
 			Value: float64(overflowCount),
 		})
@@ -189,20 +190,20 @@ func (a *Aggregator) publish(ctx context.Context, period time.Duration) error {
 }
 
 // ProcessBatch aggregates all service summary metrics.
-func (a *Aggregator) ProcessBatch(ctx context.Context, b *model.Batch) error {
+func (a *Aggregator) ProcessBatch(ctx context.Context, b *modelpb.Batch) error {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	for _, event := range *b {
 		// Ignoring spans since they add no value.
-		if event.Processor == model.SpanProcessor {
+		if event.Processor.IsSpan() {
 			continue
 		}
-		a.processEvent(&event)
+		a.processEvent(event)
 	}
 	return nil
 }
 
-func (a *Aggregator) processEvent(event *model.APMEvent) {
+func (a *Aggregator) processEvent(event *modelpb.APMEvent) {
 	for _, interval := range a.Intervals {
 		key := makeAggregationKey(event, interval)
 		a.active[interval].storeOrUpdate(key, interval, a.config.Logger)
@@ -303,11 +304,11 @@ type comparable struct {
 	serviceLanguageName string
 }
 
-func makeAggregationKey(event *model.APMEvent, interval time.Duration) aggregationKey {
+func makeAggregationKey(event *modelpb.APMEvent, interval time.Duration) aggregationKey {
 	key := aggregationKey{
 		comparable: comparable{
 			// Group metrics by time interval.
-			timestamp: event.Timestamp.Truncate(interval),
+			timestamp: event.Timestamp.AsTime().Truncate(interval),
 
 			agentName:           event.Agent.Name,
 			serviceName:         event.Service.Name,
@@ -333,23 +334,23 @@ func makeOverflowAggregationKey(interval time.Duration) aggregationKey {
 	}
 }
 
-func makeMetricset(key aggregationKey, interval string) model.APMEvent {
-	return model.APMEvent{
-		Timestamp: key.timestamp,
-		Service: model.Service{
+func makeMetricset(key aggregationKey, interval string) *modelpb.APMEvent {
+	return &modelpb.APMEvent{
+		Timestamp: timestamppb.New(key.timestamp),
+		Service: &modelpb.Service{
 			Name:        key.serviceName,
 			Environment: key.serviceEnvironment,
-			Language: model.Language{
+			Language: &modelpb.Language{
 				Name: key.serviceLanguageName,
 			},
 		},
-		Agent: model.Agent{
+		Agent: &modelpb.Agent{
 			Name: key.agentName,
 		},
 		Labels:        key.Labels,
 		NumericLabels: key.NumericLabels,
-		Processor:     model.MetricsetProcessor,
-		Metricset: &model.Metricset{
+		Processor:     modelpb.MetricsetProcessor(),
+		Metricset: &modelpb.Metricset{
 			Name:     metricsetName,
 			Interval: interval,
 		},

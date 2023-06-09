@@ -20,19 +20,19 @@ package api
 import (
 	"net/http"
 	httppprof "net/http/pprof"
-	"net/netip"
 	"regexp"
 	"runtime/pprof"
 
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/apm-data/input/elasticapm"
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-data/model/modelprocessor"
 	"github.com/elastic/apm-server/internal/agentcfg"
 	"github.com/elastic/apm-server/internal/beater/api/config/agent"
@@ -82,7 +82,7 @@ const (
 // APM Server API.
 func NewMux(
 	beaterConfig *config.Config,
-	batchProcessor model.BatchProcessor,
+	batchProcessor modelpb.BatchProcessor,
 	authenticator *auth.Authenticator,
 	fetcher agentcfg.Fetcher,
 	ratelimitStore *ratelimit.Store,
@@ -162,7 +162,7 @@ func NewMux(
 type routeBuilder struct {
 	cfg              *config.Config
 	authenticator    *auth.Authenticator
-	batchProcessor   model.BatchProcessor
+	batchProcessor   modelpb.BatchProcessor
 	ratelimitStore   *ratelimit.Store
 	sourcemapFetcher sourcemap.Fetcher
 	intakeProcessor  *elasticapm.Processor
@@ -293,43 +293,44 @@ func rootMiddleware(cfg *config.Config, authenticator *auth.Authenticator) []mid
 	)
 }
 
-func baseRequestMetadata(c *request.Context) model.APMEvent {
-	return model.APMEvent{
-		Timestamp: c.Timestamp,
+func baseRequestMetadata(c *request.Context) *modelpb.APMEvent {
+	return &modelpb.APMEvent{
+		Timestamp: timestamppb.New(c.Timestamp),
 	}
 }
 
-func backendRequestMetadataFunc(cfg *config.Config) func(c *request.Context) model.APMEvent {
+func backendRequestMetadataFunc(cfg *config.Config) func(c *request.Context) *modelpb.APMEvent {
 	if !cfg.AugmentEnabled {
 		return baseRequestMetadata
 	}
-	return func(c *request.Context) model.APMEvent {
-		var hostIP []netip.Addr
+	return func(c *request.Context) *modelpb.APMEvent {
+		event := &modelpb.APMEvent{
+			Timestamp: timestamppb.New(c.Timestamp),
+		}
 		if c.ClientIP.IsValid() {
-			hostIP = []netip.Addr{c.ClientIP}
+			event.Host = &modelpb.Host{
+				Ip: []string{c.ClientIP.String()},
+			}
 		}
-		return model.APMEvent{
-			Host:      model.Host{IP: hostIP},
-			Timestamp: c.Timestamp,
-		}
+		return event
 	}
 }
 
-func rumRequestMetadataFunc(cfg *config.Config) func(c *request.Context) model.APMEvent {
+func rumRequestMetadataFunc(cfg *config.Config) func(c *request.Context) *modelpb.APMEvent {
 	if !cfg.AugmentEnabled {
 		return baseRequestMetadata
 	}
-	return func(c *request.Context) model.APMEvent {
-		e := model.APMEvent{
-			Client:    model.Client{IP: c.ClientIP},
-			Source:    model.Source{IP: c.SourceIP, Port: c.SourcePort},
-			Timestamp: c.Timestamp,
-			UserAgent: model.UserAgent{Original: c.UserAgent},
+	return func(c *request.Context) *modelpb.APMEvent {
+		e := modelpb.APMEvent{
+			Client:    &modelpb.Client{Ip: c.ClientIP.String()},
+			Source:    &modelpb.Source{Ip: c.SourceIP.String(), Port: uint32(c.SourcePort)},
+			Timestamp: timestamppb.New(c.Timestamp),
+			UserAgent: &modelpb.UserAgent{Original: c.UserAgent},
 		}
 		if c.SourceNATIP.IsValid() {
-			e.Source.NAT = &model.NAT{IP: c.SourceNATIP}
+			e.Source.Nat = &modelpb.NAT{Ip: c.SourceNATIP.String()}
 		}
-		return e
+		return &e
 	}
 }
 

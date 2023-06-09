@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-server/x-pack/apm-server/sampling/eventstorage"
 )
 
@@ -42,8 +42,8 @@ func testWriteEvents(t *testing.T, numSpans int) {
 	beforeWrite := time.Now()
 	traceID := uuid.Must(uuid.NewV4()).String()
 	transactionID := uuid.Must(uuid.NewV4()).String()
-	transaction := model.APMEvent{
-		Transaction: &model.Transaction{ID: transactionID},
+	transaction := modelpb.APMEvent{
+		Transaction: &modelpb.Transaction{Id: transactionID},
 	}
 	wOpts := eventstorage.WriterOpts{
 		TTL:                 time.Minute,
@@ -51,26 +51,26 @@ func testWriteEvents(t *testing.T, numSpans int) {
 	}
 	assert.NoError(t, readWriter.WriteTraceEvent(traceID, transactionID, &transaction, wOpts))
 
-	var spanEvents []model.APMEvent
+	var spanEvents []*modelpb.APMEvent
 	for i := 0; i < numSpans; i++ {
 		spanID := uuid.Must(uuid.NewV4()).String()
-		span := model.APMEvent{
-			Span: &model.Span{ID: spanID},
+		span := modelpb.APMEvent{
+			Span: &modelpb.Span{Id: spanID},
 		}
 		assert.NoError(t, readWriter.WriteTraceEvent(traceID, spanID, &span, wOpts))
-		spanEvents = append(spanEvents, span)
+		spanEvents = append(spanEvents, &span)
 	}
 	afterWrite := time.Now()
 
 	// We can read our writes without flushing.
-	var batch model.Batch
+	var batch modelpb.Batch
 	assert.NoError(t, readWriter.ReadTraceEvents(traceID, &batch))
-	assert.ElementsMatch(t, append(spanEvents, transaction), batch)
+	assert.ElementsMatch(t, append(spanEvents, &transaction), batch)
 
 	// Flush in order for the writes to be visible to other readers.
 	assert.NoError(t, readWriter.Flush(wOpts.StorageLimitInBytes))
 
-	var recorded []model.APMEvent
+	var recorded []*modelpb.APMEvent
 	assert.NoError(t, db.View(func(txn *badger.Txn) error {
 		iter := txn.NewIterator(badger.IteratorOptions{
 			Prefix: []byte(traceID),
@@ -94,12 +94,12 @@ func testWriteEvents(t *testing.T, numSpans int) {
 				return !expiryTime.After(upperBound)
 			}, "expiry time %s is after %s", expiryTime, upperBound)
 
-			var event model.APMEvent
+			var event modelpb.APMEvent
 			require.Equal(t, "e", string(item.UserMeta()))
 			assert.NoError(t, item.Value(func(data []byte) error {
 				return json.Unmarshal(data, &event)
 			}))
-			recorded = append(recorded, event)
+			recorded = append(recorded, &event)
 		}
 		return nil
 	}))
@@ -197,11 +197,11 @@ func TestReadTraceEvents(t *testing.T) {
 	reader := store.NewShardedReadWriter()
 	defer reader.Close()
 
-	var events model.Batch
+	var events modelpb.Batch
 	assert.NoError(t, reader.ReadTraceEvents(string(traceID[:]), &events))
-	assert.Equal(t, model.Batch{
-		{Transaction: &model.Transaction{Name: "transaction"}},
-		{Span: &model.Span{Name: "span"}},
+	assert.Equal(t, modelpb.Batch{
+		{Transaction: &modelpb.Transaction{Name: "transaction"}},
+		{Span: &modelpb.Span{Name: "span"}},
 	}, events)
 }
 
@@ -222,7 +222,7 @@ func TestReadTraceEventsDecodeError(t *testing.T) {
 	reader := store.NewShardedReadWriter()
 	defer reader.Close()
 
-	var events model.Batch
+	var events modelpb.Batch
 	err := reader.ReadTraceEvents(string(traceID[:]), &events)
 	assert.Error(t, err)
 }
@@ -280,7 +280,7 @@ func TestStorageLimit(t *testing.T) {
 
 	traceID := uuid.Must(uuid.NewV4()).String()
 	transactionID := uuid.Must(uuid.NewV4()).String()
-	transaction := model.APMEvent{Transaction: &model.Transaction{ID: transactionID}}
+	transaction := modelpb.APMEvent{Transaction: &modelpb.Transaction{Id: transactionID}}
 	err := readWriter.WriteTraceEvent(traceID, transactionID, &transaction, eventstorage.WriterOpts{
 		TTL:                 time.Minute,
 		StorageLimitInBytes: 1, // ignored in the write, because there's no implicit flush
@@ -293,7 +293,7 @@ func TestStorageLimit(t *testing.T) {
 	assert.ErrorIs(t, err, eventstorage.ErrLimitReached)
 
 	// Assert the stored write has been discarded.
-	var batch model.Batch
+	var batch modelpb.Batch
 	readWriter.ReadTraceEvents(traceID, &batch)
 	assert.Equal(t, 0, len(batch))
 }

@@ -23,10 +23,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 )
 
 func TestReportFetch(t *testing.T) {
@@ -70,34 +72,45 @@ func TestReportFetch(t *testing.T) {
 	for i, received := range bp.received {
 		// Assert the timestamp is not empty and set the timestamp to an empty
 		// value so we can assert equality in the list contents.
-		assert.NotZero(t, received.Timestamp, "empty timestamp")
-		bp.received[i].Timestamp = time.Time{}
+		assert.NotZero(t, received.Timestamp.AsTime(), "empty timestamp")
+		bp.received[i].Timestamp = nil
 	}
 
 	// We use assert.ElementsMatch because the etags may not be
 	// reported in exactly the same order they were fetched.
-	assert.ElementsMatch(t, []model.APMEvent{
+	assert.Empty(t, cmp.Diff([]*modelpb.APMEvent{
 		{
-			Processor: model.MetricsetProcessor,
-			Labels:    model.Labels{"etag": {Value: "abc123"}},
-			Metricset: &model.Metricset{
+			Processor: modelpb.MetricsetProcessor(),
+			Labels:    modelpb.Labels{"etag": {Value: "abc123"}},
+			Metricset: &modelpb.Metricset{
 				Name: "agent_config",
-				Samples: []model.MetricsetSample{
+				Samples: []*modelpb.MetricsetSample{
 					{Name: "agent_config_applied", Value: 1},
 				},
 			},
 		},
 		{
-			Processor: model.MetricsetProcessor,
-			Labels:    model.Labels{"etag": {Value: "def456"}},
-			Metricset: &model.Metricset{
+			Processor: modelpb.MetricsetProcessor(),
+			Labels:    modelpb.Labels{"etag": {Value: "def456"}},
+			Metricset: &modelpb.Metricset{
 				Name: "agent_config",
-				Samples: []model.MetricsetSample{
+				Samples: []*modelpb.MetricsetSample{
 					{Name: "agent_config_applied", Value: 1},
 				},
 			},
 		},
-	}, bp.received)
+	}, bp.received,
+		cmpopts.SortSlices(func (x *modelpb.APMEvent, y *modelpb.APMEvent) bool {
+			return x.Labels["etag"].Value < y.Labels["etag"].Value
+		}),
+		cmp.FilterPath(func(p cmp.Path) bool {
+			switch p.Last().String() {
+			case ".state", ".sizeCache", ".unknownFields":
+				return true
+			}
+			return false
+		}, cmp.Ignore()),
+	))
 }
 
 type fauxFetcher struct{}
@@ -122,11 +135,11 @@ func (f fauxFetcher) Fetch(_ context.Context, q Query) (Result, error) {
 
 type batchProcessor struct {
 	receivedc chan struct{}
-	received  []model.APMEvent
+	received  []*modelpb.APMEvent
 	mu        sync.Mutex
 }
 
-func (p *batchProcessor) ProcessBatch(_ context.Context, b *model.Batch) error {
+func (p *batchProcessor) ProcessBatch(_ context.Context, b *modelpb.Batch) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	for _, event := range *b {

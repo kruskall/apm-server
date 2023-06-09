@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-data/model/modelprocessor"
 	"github.com/elastic/apm-server/internal/beatcmd"
 	"github.com/elastic/apm-server/internal/beater"
@@ -97,7 +97,7 @@ type namedProcessor struct {
 }
 
 type processor interface {
-	model.BatchProcessor
+	modelpb.BatchProcessor
 	Run() error
 	Stop(context.Context) error
 }

@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/apm-data/input/elasticapm"
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-server/internal/beater/auth"
 	"github.com/elastic/apm-server/internal/beater/headers"
 	"github.com/elastic/apm-server/internal/beater/ratelimit"
@@ -64,10 +64,10 @@ type StreamHandler interface {
 	HandleStream(
 		ctx context.Context,
 		async bool,
-		base model.APMEvent,
+		base *modelpb.APMEvent,
 		stream io.Reader,
 		batchSize int,
-		processor model.BatchProcessor,
+		processor modelpb.BatchProcessor,
 		out *elasticapm.Result,
 	) error
 }
@@ -75,10 +75,10 @@ type StreamHandler interface {
 // RequestMetadataFunc is a function type supplied to Handler for extracting
 // metadata from the request. This is used for conditionally injecting the
 // source IP address as `client.ip` for RUM.
-type RequestMetadataFunc func(*request.Context) model.APMEvent
+type RequestMetadataFunc func(*request.Context) *modelpb.APMEvent
 
 // Handler returns a request.Handler for managing intake requests for backend and rum events.
-func Handler(handler StreamHandler, requestMetadataFunc RequestMetadataFunc, batchProcessor model.BatchProcessor) request.Handler {
+func Handler(handler StreamHandler, requestMetadataFunc RequestMetadataFunc, batchProcessor modelpb.BatchProcessor) request.Handler {
 	return func(c *request.Context) {
 		if err := validateRequest(c); err != nil {
 			writeError(c, err)

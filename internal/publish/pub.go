@@ -30,7 +30,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 )
 
 type Reporter func(context.Context, PendingReq) error
@@ -139,8 +139,8 @@ func (p *Publisher) Stop(ctx context.Context) error {
 
 // ProcessBatch transforms batch to beat.Events, and sends them to the libbeat
 // publishing pipeline.
-func (p *Publisher) ProcessBatch(ctx context.Context, batch *model.Batch) error {
-	b := make(model.Batch, len(*batch))
+func (p *Publisher) ProcessBatch(ctx context.Context, batch *modelpb.Batch) error {
+	b := make(modelpb.Batch, len(*batch))
 	copy(b, *batch)
 	return p.Send(ctx, PendingReq{Transformable: batchTransformer(b)})
 }
@@ -177,12 +177,13 @@ func (p *Publisher) run() {
 	}
 }
 
-type batchTransformer model.Batch
+type batchTransformer modelpb.Batch
 
 func (t batchTransformer) Transform(context.Context) []beat.Event {
 	out := make([]beat.Event, 0, len(t))
 	var w fastjson.Writer
-	for _, event := range t {
+	for i := range t {
+		event := t[i]
 		// Encode the event to JSON, then decode into a map.
 		// This is probably a bit horrifying, but enables us to
 		// remove the libbeat dependency from our data model.
@@ -197,7 +198,7 @@ func (t batchTransformer) Transform(context.Context) []beat.Event {
 		if err := event.MarshalFastJSON(&w); err != nil {
 			continue
 		}
-		beatEvent := beat.Event{Timestamp: event.Timestamp}
+		beatEvent := beat.Event{Timestamp: event.Timestamp.AsTime()}
 		if err := json.Unmarshal(w.Bytes(), &beatEvent.Fields); err != nil {
 			continue
 		}

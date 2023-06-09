@@ -11,24 +11,24 @@ import (
 	// json-iterator is faster for decoding.
 	jsoniter "github.com/json-iterator/go"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 )
 
 // JSONCodec is an implementation of Codec, using JSON encoding.
 type JSONCodec struct{}
 
 // DecodeEvent decodes data as JSON into event.
-func (JSONCodec) DecodeEvent(data []byte, event *model.APMEvent) error {
+func (JSONCodec) DecodeEvent(data []byte, event *modelpb.APMEvent) error {
 	return jsoniter.ConfigFastest.Unmarshal(data, (*apmEventUnderlying)(event))
 }
 
 // EncodeEvent encodes event as JSON.
-func (JSONCodec) EncodeEvent(event *model.APMEvent) ([]byte, error) {
+func (JSONCodec) EncodeEvent(event *modelpb.APMEvent) ([]byte, error) {
 	return json.Marshal((*apmEventUnderlying)(event))
 }
 
 // We type-assert to the underlying struct type in order to drop
-// model.APMEvent's MarshalJSON method, as there is no corresponding
+// modelpb.APMEvent's MarshalJSON method, as there is no corresponding
 // UnmarshalJSON method, and the marshalled structure does not match
 // the Go struct field names.
-type apmEventUnderlying model.APMEvent
+type apmEventUnderlying modelpb.APMEvent

@@ -38,7 +38,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-server/internal/agentcfg"
 	"github.com/elastic/apm-server/internal/beater/auth"
 	"github.com/elastic/apm-server/internal/beater/config"
@@ -47,7 +47,7 @@ import (
 
 func TestPostSpans(t *testing.T) {
 	var processorErr error
-	var processor model.ProcessBatchFunc = func(ctx context.Context, batch *model.Batch) error {
+	var processor modelpb.ProcessBatchFunc = func(ctx context.Context, batch *modelpb.Batch) error {
 		return processorErr
 	}
 	conn, _ := newServer(t, processor, nil)
@@ -194,7 +194,7 @@ const (
 	unauthorizedServiceName = "serviceB"
 )
 
-func newServer(t *testing.T, batchProcessor model.BatchProcessor, agentcfgFetcher agentcfg.Fetcher) (*grpc.ClientConn, *observer.ObservedLogs) {
+func newServer(t *testing.T, batchProcessor modelpb.BatchProcessor, agentcfgFetcher agentcfg.Fetcher) (*grpc.ClientConn, *observer.ObservedLogs) {
 	lis, err := net.Listen("tcp", "localhost:0")
 	require.NoError(t, err)
 

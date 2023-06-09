@@ -50,7 +50,7 @@ import (
 	"github.com/elastic/go-docappender"
 	"github.com/elastic/go-ucfg"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-data/model/modelprocessor"
 	"github.com/elastic/apm-server/internal/agentcfg"
 	"github.com/elastic/apm-server/internal/beater/auth"
@@ -455,8 +455,8 @@ func (s *Runner) Run(ctx context.Context) error {
 		// Add a model processor that rate limits, and checks authorization for the
 		// agent and service for each event. These must come at the beginning of the
 		// processor chain.
-		model.ProcessBatchFunc(rateLimitBatchProcessor),
-		model.ProcessBatchFunc(authorizeEventIngestProcessor),
+		modelpb.ProcessBatchFunc(rateLimitBatchProcessor),
+		modelpb.ProcessBatchFunc(authorizeEventIngestProcessor),
 
 		// Pre-process events before they are sent to the final processors for
 		// aggregation, sampling, and indexing.
@@ -613,14 +613,14 @@ func (s *Runner) waitReady(
 	return waitReady(ctx, s.config.WaitReadyInterval, tracer, s.logger, check)
 }
 
-// newFinalBatchProcessor returns the final model.BatchProcessor that publishes events,
+// newFinalBatchProcessor returns the final modelpb.BatchProcessor that publishes events,
 // and a cleanup function which should be called on server shutdown. If the output is
 // "elasticsearch", then we use docappender; otherwise we use the libbeat publisher.
 func (s *Runner) newFinalBatchProcessor(
 	tracer *apm.Tracer,
 	newElasticsearchClient func(cfg *elasticsearch.Config) (*elasticsearch.Client, error),
 	memLimit float64,
-) (model.BatchProcessor, func(context.Context) error, error) {
+) (modelpb.BatchProcessor, func(context.Context) error, error) {
 
 	monitoring.Default.Remove("libbeat")
 	libbeatMonitoringRegistry := monitoring.Default.NewRegistry("libbeat")
@@ -773,7 +773,7 @@ func docappenderConfig(
 func (s *Runner) newLibbeatFinalBatchProcessor(
 	tracer *apm.Tracer,
 	libbeatMonitoringRegistry *monitoring.Registry,
-) (model.BatchProcessor, func(context.Context) error, error) {
+) (modelpb.BatchProcessor, func(context.Context) error, error) {
 	// When the publisher stops cleanly it will close its pipeline client,
 	// calling the acker's Close method and unblock Wait.
 	acker := publish.NewWaitPublishedAcker()

@@ -9,9 +9,8 @@ import (
 	"sync"
 
 	"github.com/cespare/xxhash/v2"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/hashicorp/go-multierror"
-
-	"github.com/elastic/apm-data/model"
 )
 
 // ShardedReadWriter provides sharded, locked, access to a Storage.
@@ -53,12 +52,12 @@ func (s *ShardedReadWriter) Flush(limit int64) error {
 }
 
 // ReadTraceEvents calls Writer.ReadTraceEvents, using a sharded, locked, Writer.
-func (s *ShardedReadWriter) ReadTraceEvents(traceID string, out *model.Batch) error {
+func (s *ShardedReadWriter) ReadTraceEvents(traceID string, out *modelpb.Batch) error {
 	return s.getWriter(traceID).ReadTraceEvents(traceID, out)
 }
 
 // WriteTraceEvent calls Writer.WriteTraceEvent, using a sharded, locked, Writer.
-func (s *ShardedReadWriter) WriteTraceEvent(traceID, id string, event *model.APMEvent, opts WriterOpts) error {
+func (s *ShardedReadWriter) WriteTraceEvent(traceID, id string, event *modelpb.APMEvent, opts WriterOpts) error {
 	return s.getWriter(traceID).WriteTraceEvent(traceID, id, event, opts)
 }
 
@@ -105,13 +104,13 @@ func (rw *lockedReadWriter) Flush(limit int64) error {
 	return rw.rw.Flush(limit)
 }
 
-func (rw *lockedReadWriter) ReadTraceEvents(traceID string, out *model.Batch) error {
+func (rw *lockedReadWriter) ReadTraceEvents(traceID string, out *modelpb.Batch) error {
 	rw.mu.Lock()
 	defer rw.mu.Unlock()
 	return rw.rw.ReadTraceEvents(traceID, out)
 }
 
-func (rw *lockedReadWriter) WriteTraceEvent(traceID, id string, event *model.APMEvent, opts WriterOpts) error {
+func (rw *lockedReadWriter) WriteTraceEvent(traceID, id string, event *modelpb.APMEvent, opts WriterOpts) error {
 	rw.mu.Lock()
 	defer rw.mu.Unlock()
 	return rw.rw.WriteTraceEvent(traceID, id, event, opts)

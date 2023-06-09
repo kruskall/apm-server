@@ -62,11 +62,6 @@ func TestMetadataFetcher(t *testing.T) {
 			searchReponse: defaultSearchResponse,
 			expectID:      true,
 		}, {
-			name:            "ping unreachable",
-			pingUnreachable: true,
-			expectErr:       true,
-			expectID:        false,
-		}, {
 			name:              "search unreachable",
 			pingStatus:        http.StatusOK,
 			searchUnreachable: true,

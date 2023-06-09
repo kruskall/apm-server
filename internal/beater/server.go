@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
-	"github.com/elastic/apm-data/model"
+	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-data/model/modelprocessor"
 	"github.com/elastic/apm-server/internal/agentcfg"
 	"github.com/elastic/apm-server/internal/beater/api"
@@ -101,9 +101,9 @@ type ServerParams struct {
 	// AgentConfig holds an interface for fetching agent configuration.
 	AgentConfig agentcfg.Fetcher
 
-	// BatchProcessor is the model.BatchProcessor that is used
+	// BatchProcessor is the modelpb.BatchProcessor that is used
 	// for publishing events to the output, such as Elasticsearch.
-	BatchProcessor model.BatchProcessor
+	BatchProcessor modelpb.BatchProcessor
 
 	// PublishReady holds a channel which will be signalled when the serve
 	// is ready to publish events. Readiness means that preconditions for
@@ -185,7 +185,7 @@ func newServer(args ServerParams, listener net.Listener) (server, error) {
 	if args.Config.AugmentEnabled {
 		// Add a model processor that sets `client.ip` for events from end-user devices.
 		otlpBatchProcessor = modelprocessor.Chained{
-			model.ProcessBatchFunc(otlp.SetClientMetadata),
+			modelpb.ProcessBatchFunc(otlp.SetClientMetadata),
 			otlpBatchProcessor,
 		}
 	}
