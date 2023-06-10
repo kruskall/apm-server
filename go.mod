@@ -160,4 +160,5 @@ replace (
 	// We replace golang/glog, which is used by ristretto, to avoid polluting the
 	// command line flags and conflicting with command line flags added by libbeat.
 	github.com/golang/glog => ./internal/glog
+	github.com/elastic/apm-data => ../apm-data
 )
