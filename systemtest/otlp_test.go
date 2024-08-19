@@ -166,12 +166,11 @@ func TestOTLPGRPCTraceSpanLinks(t *testing.T) {
 	assert.False(t, gjson.GetBytes(span1.RawSource, "span.links").Exists())
 	links := gjson.GetBytes(span2.RawSource, "span.links")
 	assert.True(t, links.Exists())
-	assert.Equal(t, []interface{}{
+	assert.Equal(t,
 		map[string]interface{}{
 			"span":  map[string]interface{}{"id": spanContext1.SpanID().String()},
 			"trace": map[string]interface{}{"id": spanContext1.TraceID().String()},
-		},
-	}, links.Value())
+		}, links.Value())
 }
 
 func TestOTLPGRPCMetrics(t *testing.T) {

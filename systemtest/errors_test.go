@@ -73,15 +73,13 @@ func TestErrorExceptionCause(t *testing.T) {
 
 	result := estest.ExpectDocs(t, systemtest.Elasticsearch, "logs-apm.error*", nil)
 	errorObj := result.Hits.Hits[0].Source["error"].(map[string]any)
-	exceptions := errorObj["exception"].([]any)
+	exceptions := errorObj["exception"].(map[string]any)
+	messages := exceptions["message"].([]any)
 
-	require.Len(t, exceptions, 4)
-	assert.Equal(t, "parent: child1: grandchild child2", exceptions[0].(map[string]any)["message"])
-	assert.Equal(t, "child1: grandchild", exceptions[1].(map[string]any)["message"])
-	assert.Equal(t, "grandchild", exceptions[2].(map[string]any)["message"])
-	assert.Equal(t, "child2", exceptions[3].(map[string]any)["message"])
-	assert.NotContains(t, exceptions[0], "parent")
-	assert.NotContains(t, exceptions[1], "parent")
-	assert.NotContains(t, exceptions[2], "parent")
-	assert.Equal(t, float64(0), exceptions[3].(map[string]any)["parent"])
+	require.Len(t, messages, 4)
+	assert.Equal(t, "parent: child1: grandchild child2", messages[0])
+	assert.Equal(t, "child1: grandchild", messages[1])
+	assert.Equal(t, "grandchild", messages[2])
+	assert.Equal(t, "child2", messages[3])
+	assert.Equal(t, float64(0), exceptions["parent"])
 }

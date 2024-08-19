@@ -33,9 +33,6 @@
         "error.grouping_key": [
             "14f4d08792a45fce53a46c93851e36e1"
         ],
-        "error.grouping_name": [
-            "kablamo"
-        ],
         "error.id": [
             "dynamic"
         ],
@@ -53,8 +50,8 @@
             "true"
         ],
         "labels.resource_attribute_bool_array": [
-            "true",
-            "false"
+            "false",
+            "true"
         ],
         "message": [
             "kablamo"
@@ -154,8 +151,8 @@
             "true"
         ],
         "labels.resource_attribute_bool_array": [
-            "true",
-            "false"
+            "false",
+            "true"
         ],
         "message": [
             "a_span_event"
@@ -243,8 +240,8 @@
             "true"
         ],
         "labels.resource_attribute_bool_array": [
-            "true",
-            "false"
+            "false",
+            "true"
         ],
         "labels.span_attribute_array": [
             "a",

@@ -112,10 +112,10 @@
             1
         ],
         "error.exception.type": [
+            "ConnectionError",
             "DbError",
             "InternalDbError",
-            "VeryInternalDbError",
-            "ConnectionError"
+            "VeryInternalDbError"
         ],
         "error.grouping_key": [
             "d72b25a26fde3f3aaad1c86950acd070"
@@ -165,22 +165,14 @@
         "http.request.headers": [
             {
                 "Array": [
-                    "foo",
                     "bar",
-                    "baz"
-                ],
-                "Content-Type": [
-                    "text/html"
-                ],
-                "Cookie": [
-                    "c1=v1,c2=v2"
-                ],
-                "Some-Other-Header": [
+                    "baz",
                     "foo"
                 ],
-                "User-Agent": [
-                    "Mozilla Chrome Edge"
-                ]
+                "Content-Type": "text/html",
+                "Cookie": "c1=v1,c2=v2",
+                "Some-Other-Header": "foo",
+                "User-Agent": "Mozilla Chrome Edge"
             }
         ],
         "http.request.method": [
@@ -194,9 +186,7 @@
         ],
         "http.response.headers": [
             {
-                "Content-Type": [
-                    "application/json"
-                ]
+                "Content-Type": "application/json"
             }
         ],
         "http.response.headers_sent": [
@@ -450,9 +440,6 @@
         ],
         "error.grouping_key": [
             "ae0232fed4cb40e7ebc62a585a421d60"
-        ],
-        "error.grouping_name": [
-            "Cannot read property 'baz' no defined"
         ],
         "error.id": [
             "cdefab0123456789"

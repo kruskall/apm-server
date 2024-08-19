@@ -130,7 +130,7 @@ func assertSourcemapUpdated(t testing.TB, result espoll.SearchResult, updated bo
 		}
 	}
 	type Error struct {
-		Exception []struct {
+		Exception struct {
 			Stacktrace []StacktraceFrame
 		}
 		Log struct {
@@ -145,10 +145,8 @@ func assertSourcemapUpdated(t testing.TB, result espoll.SearchResult, updated bo
 		err := hit.UnmarshalSource(&source)
 		require.NoError(t, err)
 
-		for _, exception := range source.Error.Exception {
-			for _, stacktrace := range exception.Stacktrace {
-				assert.Equal(t, updated, stacktrace.Sourcemap.Updated)
-			}
+		for _, stacktrace := range source.Error.Exception.Stacktrace {
+			assert.Equal(t, updated, stacktrace.Sourcemap.Updated)
 		}
 
 		for _, stacktrace := range source.Error.Log.Stacktrace {
