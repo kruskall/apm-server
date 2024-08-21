@@ -41,7 +41,7 @@ func TestErrorGroupingName(t *testing.T) {
 	tracer.NewErrorLog(apm.ErrorLogRecord{Message: "log_message_overrides", Error: errors.New("exception_message_overridden")}).Send()
 	tracer.Flush(nil)
 
-	result := estest.ExpectMinDocs(t, systemtest.Elasticsearch, 2, "logs-apm.error-*", espoll.TermQuery{
+	result := estest.ExpectMinDocs(t, systemtest.Elasticsearch, 3, "logs-apm.error-*", espoll.TermQuery{
 		Field: "processor.event",
 		Value: "error",
 	})
