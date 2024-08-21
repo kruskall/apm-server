@@ -36,9 +36,7 @@ func TestErrorGroupingName(t *testing.T) {
 	srv := apmservertest.NewServerTB(t)
 
 	tracer := srv.Tracer()
-	// TODO logs-apm.error@mappings component template expects exception to be an array
-	// so this will fail because exception is a map
-	// tracer.NewError(errors.New("only_exception_message")).Send()
+	tracer.NewError(errors.New("only_exception_message")).Send()
 	tracer.NewErrorLog(apm.ErrorLogRecord{Message: "only_log_message"}).Send()
 	tracer.NewErrorLog(apm.ErrorLogRecord{Message: "log_message_overrides", Error: errors.New("exception_message_overridden")}).Send()
 	tracer.Flush(nil)
@@ -56,7 +54,7 @@ func TestErrorGroupingName(t *testing.T) {
 	}
 
 	assert.ElementsMatch(t, []string{
-		//"only_exception_message",
+		"only_exception_message",
 		"only_log_message",
 		"log_message_overrides",
 	}, names)
