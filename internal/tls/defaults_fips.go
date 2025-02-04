@@ -15,33 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+//go:build requirefips
 
-import (
-	"os"
+package tls
 
-	"github.com/elastic/apm-server/internal/beatcmd"
-	"github.com/elastic/apm-server/internal/beater"
-	"github.com/elastic/apm-server/internal/tls"
-)
-
-func init() {
-	tls.UpdateDefaults()
-}
-
-func main() {
-	rootCmd := beatcmd.NewRootCommand(beatcmd.BeatParams{
-		NewRunner: func(args beatcmd.RunnerParams) (beatcmd.Runner, error) {
-			return beater.NewRunner(beater.RunnerParams{
-				Config: args.Config,
-				Logger: args.Logger,
-
-				MeterProvider:   args.MeterProvider,
-				MetricsGatherer: args.MetricsGatherer,
-			})
-		},
-	})
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+func UpdateDefaults() {
+	// rely on elastic-agent-libs having secure defaults
 }

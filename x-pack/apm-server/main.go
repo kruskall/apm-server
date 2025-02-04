@@ -22,12 +22,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	"github.com/elastic/apm-data/model/modelpb"
 	"github.com/elastic/apm-data/model/modelprocessor"
 	"github.com/elastic/apm-server/internal/beatcmd"
 	"github.com/elastic/apm-server/internal/beater"
+	"github.com/elastic/apm-server/internal/tls"
 	"github.com/elastic/apm-server/x-pack/apm-server/sampling"
 	"github.com/elastic/apm-server/x-pack/apm-server/sampling/eventstorage"
 )
@@ -51,7 +51,7 @@ var (
 )
 
 func init() {
-	tlscommon.SetInsecureDefaults()
+	tls.UpdateDefaults()
 
 	management.ConfigTransform.SetTransform(
 		func(unit *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
