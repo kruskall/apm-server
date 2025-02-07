@@ -50,6 +50,8 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - run: mkdir D:\gotmp
+        if: runner.os == 'Windows'
       - uses: actions/setup-go@v5
         if: runner.os == 'Windows'
         env:
