@@ -67,7 +67,7 @@ jobs:
           cache: true
       - name: echo env
         if: runner.os == 'Windows'
-        run: echo "${{ env.TITLE }}"
+        run: echo "$TITLE"
       - env:
           CGO_ENABLED: "0"
         run: go test -v ./...
