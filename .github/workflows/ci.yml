@@ -55,6 +55,7 @@ jobs:
       - name: Step 3
         env:
           OUT_TEST: "011"
+        run: echo "ok"
       - name: Step 4
         run: |
           echo "env out $OUT_TEST"
