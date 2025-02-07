@@ -45,17 +45,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set env
+      - run: mkdir D:\gotmp
         if: runner.os == 'Windows'
-        run: |
-          echo "TITLE=foo" >> $GITHUB_ENV
       - uses: actions/setup-go@v5
         if: runner.os != 'Windows'
         with:
           go-version-file: go.mod
           cache: true
-      - run: mkdir D:\gotmp
-        if: runner.os == 'Windows'
       - uses: actions/setup-go@v5
         if: runner.os == 'Windows'
         env:
@@ -65,11 +61,16 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: echo env
-        if: runner.os == 'Windows'
-        run: echo "$TITLE"
       - env:
           CGO_ENABLED: "0"
+        if: runner.os != 'Windows'
+        run: go test -v ./...
+      - env:
+          CGO_ENABLED: "0"
+          GOCACHE: "D:\\gocache"
+          GOMODCACHE: "D:\\gomodcache"
+          GOTMPDIR: "D:\\gotmp"
+        if: runner.os == 'Windows'
         run: go test -v ./...
 
   system-test:
