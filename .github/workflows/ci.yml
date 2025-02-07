@@ -55,7 +55,7 @@ jobs:
           mkdir D:\gotmp
       - name: Deploy using stored timestamp
         run: |
-          echo "Deploying at $GOMODCACHE $COLOUR"
+          echo "Deploying at $GOMODCACHE '${{ env.COLOUR }}'"
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
