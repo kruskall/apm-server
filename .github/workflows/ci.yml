@@ -55,7 +55,10 @@ jobs:
           mkdir D:\gotmp
           echo $GITHUB_ENV
       - name: Deploy using stored timestamp
-        run: echo "Deploying at $GOMODCACHE $COLOUR"
+        run: |
+          echo "Deploying at $GOMODCACHE $COLOUR"
+          env
+          echo $GITHUB_ENV
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
