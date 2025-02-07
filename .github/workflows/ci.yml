@@ -48,17 +48,14 @@ jobs:
       - name: update GOCACHE vars
         if: runner.os == 'Windows'
         run: |
-          echo "GOCACHE=D:\gocache"  >> "$GITHUB_ENV"
-          echo "GOMODCACHE=D:\gomodcache" >> "$GITHUB_ENV"
-          echo "GOTMPDIR=D:\gotmp" >> "$GITHUB_ENV"
+          # echo "GOCACHE=D:\gocache"  >> "$GITHUB_ENV"
+          # echo "GOMODCACHE=D:\gomodcache" >> "$GITHUB_ENV"
+          # echo "GOTMPDIR=D:\gotmp" >> "$GITHUB_ENV"
           echo "COLOUR=blue" >> $GITHUB_ENV
           mkdir D:\gotmp
-          echo $GITHUB_ENV
       - name: Deploy using stored timestamp
         run: |
           echo "Deploying at $GOMODCACHE $COLOUR"
-          env
-          echo $GITHUB_ENV
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
