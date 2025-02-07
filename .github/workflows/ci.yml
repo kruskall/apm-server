@@ -45,6 +45,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Set env
+        if: runner.os == 'Windows'
+        run: |
+          echo "TITLE=foo" >> $GITHUB_ENV
       - uses: actions/setup-go@v5
         if: runner.os != 'Windows'
         with:
@@ -61,6 +65,9 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: echo env
+        if: runner.os == 'Windows'
+        run: echo "${{ env.TITLE }}"
       - env:
           CGO_ENABLED: "0"
         run: go test -v ./...
