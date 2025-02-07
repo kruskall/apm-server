@@ -45,32 +45,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Step 1
-        run: |
-          echo "action_state=yellow" >> $GITHUB_ENV
-          echo "State is: '${{ env.action_state }}'" # No output since same step
-      - name: Step 2
-        run: |
-          echo "State is: '${{ env.action_state }}'" # Output works
-      - name: Step 3
-        env:
-          OUT_TEST: "011"
-        run: echo "ok"
-      - name: Step 4
-        run: |
-          echo "env out $OUT_TEST"
-      - name: update GOCACHE vars
-        if: runner.os == 'Windows'
-        run: |
-          # echo "GOCACHE=D:\gocache"  >> "$GITHUB_ENV"
-          # echo "GOMODCACHE=D:\gomodcache" >> "$GITHUB_ENV"
-          # echo "GOTMPDIR=D:\gotmp" >> "$GITHUB_ENV"
-          echo "COLOUR=blue" >> $GITHUB_ENV
-          mkdir D:\gotmp
-      - name: Deploy using stored timestamp
-        run: |
-          echo "Deploying at $GOMODCACHE '${{ env.COLOUR }}'"
       - uses: actions/setup-go@v5
+        if: runner.os != 'Windows'
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-go@v5
+        if: runner.os == 'Windows'
+        env:
+          GOCACHE: "D:\\gocache"
+          GOMODCACHE: "D:\\gomodcache"
+          GOTMPDIR: "D:\\gotmp"
         with:
           go-version-file: go.mod
           cache: true
