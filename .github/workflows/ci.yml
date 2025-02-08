@@ -48,11 +48,11 @@ jobs:
       - name: override windows envs
         if: runner.os == 'Windows'
         run: |
-          #mkdir D:/gotmp
+          #mkdir D:\a\gotmp
           mkdir C:\Users\runneradmin\AppData\Roaming\go
-          echo "GOCACHE=D:/gocache" >> C:\Users\runneradmin\AppData\Roaming\go\env
-          echo "GOMODCACHE=D:/gomodcache" >> C:\Users\runneradmin\AppData\Roaming\go\env
-          #echo "GOTMPDIR=D:/gotmp" >> C:\Users\runneradmin\AppData\Roaming\go\env
+          echo "GOCACHE=D:\a\gocache" >> C:\Users\runneradmin\AppData\Roaming\go\env
+          echo "GOMODCACHE=D:\a\gomodcache" >> C:\Users\runneradmin\AppData\Roaming\go\env
+          echo "GOTMPDIR=D:\a\gotmp" >> C:\Users\runneradmin\AppData\Roaming\go\env
           cat C:\Users\runneradmin\AppData\Roaming\go\env
       - uses: actions/setup-go@v5
         with:
