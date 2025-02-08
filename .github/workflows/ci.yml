@@ -61,12 +61,12 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - run: go env GOENV
+        if: runner.os == 'Windows'
       - env:
           CGO_ENABLED: "0"
         if: runner.os != 'Windows'
         run: go test -v ./...
-      - run: go env GOENV
-        if: runner.os == 'Windows'
       - env:
           CGO_ENABLED: "0"
           GOCACHE: "D:\\gocache"
