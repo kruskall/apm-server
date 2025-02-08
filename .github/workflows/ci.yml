@@ -49,6 +49,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           mkdir D:\gotmp
+          chmod 777 D:\gotmp
           mkdir C:\Users\runneradmin\AppData\Roaming\go
           echo "GOCACHE=D:\gocache" >> C:\Users\runneradmin\AppData\Roaming\go\env
           echo "GOMODCACHE=D:\gomodcache" >> C:\Users\runneradmin\AppData\Roaming\go\env
