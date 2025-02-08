@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: override windows envs
         if: runner.os == 'Windows'
-      - run: |
+        run: |
           run: mkdir D:\gotmp
           echo "GOCACHE=D:\\gocache" >> C:\Users\runneradmin\AppData\Roaming\go\env
           echo "GOMODCACHE=D:\\gomodcache" >> C:\Users\runneradmin\AppData\Roaming\go\env
