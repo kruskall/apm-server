@@ -45,15 +45,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: override windows envs
-        if: runner.os == 'Windows'
-        run: |
-          mkdir D:\gotmp
-          mkdir C:\Users\runneradmin\AppData\Roaming\go
-          echo "GOCACHE=D:\gocache" >> C:\Users\runneradmin\AppData\Roaming\go\env
-          echo "GOMODCACHE=D:\gomodcache" >> C:\Users\runneradmin\AppData\Roaming\go\env
-          echo "GOTMPDIR=D:\gotmp" >> C:\Users\runneradmin\AppData\Roaming\go\env
-          cat C:\Users\runneradmin\AppData\Roaming\go\env
       - uses: antontroshin/setup-go@bda02de8887c9946189f81e7e59512914aeb9ea4
         if: runner.os == 'Windows'
         with:
