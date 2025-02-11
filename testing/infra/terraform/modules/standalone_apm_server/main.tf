@@ -14,6 +14,7 @@ locals {
     "AlmaLinux OS 9"                  = "764336703387" # AlmaLinux OS Foundation
     "OL8"                             = "131827586825" # Oracle
     "OL9"                             = "131827586825" # Oracle
+    "openSUSE-Leap-15"                = "679593333241"
   }
   instance_types = {
     "ubuntu-focal-20.04-arm64-server" = "t4g.nano"
@@ -30,6 +31,7 @@ locals {
     "AlmaLinux OS 9"                  = "t4g.nano"
     "OL8"                             = "t4g.nano"
     "OL9"                             = "t4g.nano"
+    "openSUSE-Leap-15"                = "t4g.nano"
   }
   instance_arch = {
     "ubuntu-focal-20.04-arm64-server" = "arm64"
@@ -46,6 +48,7 @@ locals {
     "AlmaLinux OS 9"                  = "arm64"
     "OL8"                             = "arm64"
     "OL9"                             = "arm64"
+    "openSUSE-Leap-15"                = "arm64"
   }
   instance_ea_provision_cmd = {
     "ubuntu-focal-20.04-arm64-server" = "curl ${data.external.latest_elastic_agent.result.deb_arm} -o elastic-agent.deb && sudo dpkg -i elastic-agent.deb"
@@ -62,6 +65,7 @@ locals {
     "AlmaLinux OS 9"                  = "curl ${data.external.latest_elastic_agent.result.rpm_arm} -o elastic-agent.rpm && sudo rpm -i elastic-agent.rpm"
     "OL8"                             = "curl ${data.external.latest_elastic_agent.result.rpm_arm} -o elastic-agent.rpm && sudo rpm -i elastic-agent.rpm"
     "OL9"                             = "curl ${data.external.latest_elastic_agent.result.rpm_arm} -o elastic-agent.rpm && sudo rpm -i elastic-agent.rpm"
+    "openSUSE-Leap-15"                = "curl ${data.external.latest_elastic_agent.result.rpm_arm} -o elastic-agent.rpm && sudo rpm -i elastic-agent.rpm"
   }
   instance_standalone_provision_cmd = {
     "ubuntu-focal-20.04-arm64-server" = "curl ${data.external.latest_apm_server.result.deb_arm} -o apm-server.deb && sudo dpkg -i apm-server.deb"
@@ -78,6 +82,7 @@ locals {
     "AlmaLinux OS 9"                  = "curl ${data.external.latest_apm_server.result.rpm_arm} -o apm-server.rpm && sudo rpm -i apm-server.rpm"
     "OL8"                             = "curl ${data.external.latest_apm_server.result.rpm_arm} -o apm-server.rpm && sudo rpm -i apm-server.rpm"
     "OL9"                             = "curl ${data.external.latest_apm_server.result.rpm_arm} -o apm-server.rpm && sudo rpm -i apm-server.rpm"
+    "openSUSE-Leap-15"                = "curl ${data.external.latest_apm_server.result.rpm_arm} -o apm-server.rpm && sudo rpm -i apm-server.rpm"
   }
   image_ssh_users = {
     "ubuntu-focal-20.04-arm64-server" = "ubuntu"
@@ -94,6 +99,7 @@ locals {
     "AlmaLinux OS 9"                  = "ec2-user"
     "OL8"                             = "ec2-user"
     "OL9"                             = "ec2-user"
+    "openSUSE-Leap-15"                = "ec2-user"
   }
 
   apm_port  = "8200"

@@ -14,5 +14,6 @@ os_names=(
     "AlmaLinux OS 9"
     "OL8"
     "OL9"
+    "openSUSE-Leap-15"
 )
 
