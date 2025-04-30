@@ -86,7 +86,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - uses: rlespinasse/github-slug-action@aba9f8db6ef36e0733227a62673d6592b1f430ea
+      - uses: rlespinasse/github-slug-action@955b5ba4560860f8a633bd24190941f16016e42c
 
       - name: Set up env
         run: |
@@ -109,7 +109,7 @@ jobs:
           echo "BENCHMARK_RUN=Benchmark[^T]" >> "$GITHUB_ENV"
 
       - name: Log in to the Elastic Container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
         with:
           registry: ${{ secrets.ELASTIC_DOCKER_REGISTRY }}
           username: ${{ secrets.ELASTIC_DOCKER_USERNAME }}
@@ -237,7 +237,7 @@ jobs:
           github-token: ${{ steps.get_token.outputs.token }}
 
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@cb9bde2e2525e640591a934b1fd28eef1dcaf5e5  # v6.2.0
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec  # v6.3.0
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
