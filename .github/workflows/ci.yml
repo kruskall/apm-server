@@ -62,6 +62,8 @@ jobs:
           restore-keys: |
             go-
       - run: go test -v -race ./...
+      - run: git diff
+      - run: echo "ok" && cat go.mod
 
   functional-test:
     runs-on: ubuntu-latest
