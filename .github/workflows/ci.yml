@@ -61,7 +61,7 @@ jobs:
           key: go-${{ hashFiles('go.mod') }}
           restore-keys: |
             go-
-      - run: go mod tidy -diff
+      - run: go mod tidy
       - run: git diff
       - run: echo "ok" && cat go.mod
 
