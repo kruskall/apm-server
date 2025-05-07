@@ -33,13 +33,10 @@ jobs:
         with:
           go-version-file: go.mod
           cache: false
-      - id: go-cache-paths
-        run: |
-          echo "mod-cache=$(go env GOMODCACHE)/cache" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4.2.3
         with:
           path: |
-            ${{ steps.go-cache-paths.outputs.mod-cache }}
+            ~/go/pkg/mod/cache
           key: go-${{ hashFiles('go.mod') }}
           restore-keys: |
             go-
@@ -56,11 +53,14 @@ jobs:
         with:
           go-version-file: go.mod
           cache: false
+      - id: go-cache-paths
+        run: |
+          echo "mod-cache=$(go env GOMODCACHE)/cache" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4.2.3
         with:
           enableCrossOsArchive: true
           path: |
-            ~/go/pkg/mod/cache
+            ${{ steps.go-cache-paths.outputs.mod-cache }}
           key: go-${{ hashFiles('go.mod') }}
           restore-keys: |
             go-
