@@ -33,10 +33,13 @@ jobs:
         with:
           go-version-file: go.mod
           cache: false
+      - id: go-cache-paths
+        run: |
+          echo "mod-cache=$(go env GOMODCACHE)/cache" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4.2.3
         with:
           path: |
-            ~/go/pkg/mod/cache
+            ${{ steps.go-cache-paths.outputs.mod-cache }}
           key: go-${{ hashFiles('go.mod') }}
           restore-keys: |
             go-
