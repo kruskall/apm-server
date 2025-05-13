@@ -62,8 +62,11 @@ jobs:
           restore-keys: |
             go-
       - run: ls
+      - run: echo "$HOME"
+      - run: echo "$(go env GOMODCACHE)"
+        shell: bash
       - run: ls $(go env GOMODCACHE)/cache
-      - run: echo "ok" && cat go.mod
+        shell: bash
 
   functional-test:
     runs-on: ubuntu-latest
