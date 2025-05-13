@@ -61,8 +61,8 @@ jobs:
           key: go-${{ hashFiles('go.mod') }}
           restore-keys: |
             go-
-      - run: go mod tidy
-      - run: git diff
+      - run: ls
+      - run: ls $(go env GOMODCACHE)
       - run: echo "ok" && cat go.mod
 
   functional-test:
