@@ -62,7 +62,7 @@ jobs:
           restore-keys: |
             go-
       - run: ls
-      - run: ls $(go env GOMODCACHE)
+      - run: ls $(go env GOMODCACHE)/cache
       - run: echo "ok" && cat go.mod
 
   functional-test:
