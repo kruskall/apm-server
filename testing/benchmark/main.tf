@@ -36,7 +36,9 @@ module "tags" {
   project = startswith(var.user_name, "benchci") ? local.project : "${local.project}-${var.user_name}"
 }
 
-provider "ec" {}
+provider "ec" {
+  endpoint = "https://api.qa.cld.elstc.co/"
+}
 
 provider "aws" {
   region = var.worker_region

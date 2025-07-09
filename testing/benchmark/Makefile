@@ -44,7 +44,7 @@ endif
 .default: all
 
 .PHONY: all
-all: $(SSH_KEY) terraform.tfvars apmbench auth apply
+all: $(SSH_KEY) terraform.tfvars apmbench apply
 
 MAKEFILE_PATH:=$(abspath $(lastword ${MAKEFILE_LIST}))
 MAKEFILE_DIR:=$(dir ${MAKEFILE_PATH})

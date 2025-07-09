@@ -5,8 +5,8 @@ user_name = "USER"
 worker_instance_type = "c6i.large"
 
 # Elastic Cloud
-ess_region          = "us-west-2"
-deployment_template = "aws-cpu-optimized-faster-warm"
+ess_region          = "aws-eu-west-1"
+deployment_template = "aws-cpu-optimized-faster-warm-arm"
 # The number of AZs the APM Server should span.
 apm_server_zone_count = 1
 # The Elasticsearch cluster node size.
