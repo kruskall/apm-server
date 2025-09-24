@@ -61,7 +61,7 @@ jobs:
           key: go-${{ hashFiles('go.mod') }}
           restore-keys: |
             go-
-      - run: go test -v -race -json ./... | go run gotest.tools/gotestsum@latest tool slowest --threshold 1s
+      - run: go test -v -race -x ./...
 
   test-integration-server-internal:
     runs-on: ubuntu-latest
