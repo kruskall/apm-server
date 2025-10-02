@@ -161,11 +161,6 @@ var i int
 // BuildServerBinary builds the apm-server binary for the given GOOS
 // and GOARCH, returning its absolute path.
 func BuildServerBinary(goos, goarch string) (string, error) {
-	apmServerBinaryMu.Lock()
-	defer apmServerBinaryMu.Unlock()
-	if binary := apmServerBinary[goos]; binary != "" {
-		return binary, nil
-	}
 
 	repoRoot, err := getRepoRoot()
 	if err != nil {
