@@ -131,6 +131,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: make system-test
       - run: ls -alh build/
+      - run: go version -m build/apm-server-linux-amd64
 
   system-test-fips:
     runs-on: ubuntu-latest
