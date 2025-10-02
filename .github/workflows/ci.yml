@@ -130,6 +130,7 @@ jobs:
           GOTESTFLAGS: "-v"
           GH_TOKEN: ${{ github.token }}
         run: make system-test
+      - run: ls -alh build/
 
   system-test-fips:
     runs-on: ubuntu-latest
