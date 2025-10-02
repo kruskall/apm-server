@@ -156,6 +156,8 @@ func (c *ServerCmd) cleanup() {
 	}
 }
 
+var i int
+
 // BuildServerBinary builds the apm-server binary for the given GOOS
 // and GOARCH, returning its absolute path.
 func BuildServerBinary(goos, goarch string) (string, error) {
@@ -179,7 +181,8 @@ func BuildServerBinary(goos, goarch string) (string, error) {
 		abspath += ".exe"
 	}
 
-	log.Printf("Building %s...", name)
+	log.Printf("Building %d %s in %s...", i, name, repoRoot)
+	i++
 	cmd := exec.Command("make", name)
 	cmd.Dir = repoRoot
 	cmd.Env = append(cmd.Env, os.Environ()...)
