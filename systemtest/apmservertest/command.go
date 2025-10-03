@@ -190,7 +190,6 @@ func BuildServerBinary(goos, goarch string) (string, error) {
 		return "", err
 	}
 	log.Println("Built", abspath)
-	apmServerBinary[goos] = abspath
 	return abspath, nil
 }
 
