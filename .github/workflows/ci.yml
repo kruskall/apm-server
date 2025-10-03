@@ -129,7 +129,7 @@ jobs:
       - env:
           GOTESTFLAGS: "-v"
           GH_TOKEN: ${{ github.token }}
-        run: make system-test
+        run: make apm-server system-test
       - run: ls -alh build/
       - run: go version -m build/apm-server-linux-amd64
 
@@ -155,7 +155,7 @@ jobs:
           # TODO: disable X25519MLKEM768 until upstream go issue is fixed https://github.com/golang/go/issues/74630#issuecomment-3224191006
           GODEBUG: "fips140=only,tlsmlkem=0"
           GH_TOKEN: ${{ github.token }}
-        run: make system-test
+        run: make apm-server-fips system-test
 
   test-package:
     runs-on: ubuntu-latest
